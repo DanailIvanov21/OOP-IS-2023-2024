@@ -29,7 +29,7 @@ Prepechena filiq s kaima se naricha strandzhanka i tova ne podlezhi na komentar.
 Sinut na strandzhanka Diana se kazva Harry.
 Princ Karl i strandzhanka Klara krali klarineti...
 
-### Задача 3 - точка
+### Задача 3 - 1 точка
 
 а)Напишете програма която прочита два текстови файла и създава трети със съдържанието на първия и втория.
 б)Напишете програма която премахва всички празни редове от новополучения текстов файл.
