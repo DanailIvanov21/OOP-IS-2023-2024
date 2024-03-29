@@ -302,11 +302,183 @@ Prepechena filiq s kaima se naricha strandzhanka i tova ne podlezhi na komentar.
 Sinut na strandzhanka Diana se kazva Harry.
 Princ Karl i strandzhanka Klara krali klarineti...
 
+<details><summary><b>Solution</b></summary> 
+<p>
+
+```cpp
+#include <iostream>
+#include <fstream>
+const int BUFF_SIZE = 1024;
+void replace(const char* filename, const char* find, const char* replace)
+{
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+        std::cout << "Error ifsream";
+        return;
+    }
+ 
+    std::ofstream editedFile("Edited file.txt");
+    if (!editedFile.is_open())
+    {
+        std::cout << "Error ofstream";
+        return;
+    }
+ 
+    while (!file.eof())
+    {
+        char buff[BUFF_SIZE];
+        file >> buff;
+ 
+        if (strcmp(buff, find) == 0)
+        {
+            editedFile << replace << " ";
+        }
+        else
+        {
+            editedFile << buff << " ";
+        }
+ 
+    }
+    file.close();
+    editedFile.close();
+ 
+}
+ 
+int main()
+{
+    replace("princesa.txt", "princesa", "strandzhanka");
+}
+```
+
+</p>
+</details>
+
 ### Задача 3 - 1 точка
 
 а)Напишете програма която прочита два текстови файла и създава трети със съдържанието на първия и втория.
 б)Напишете програма която премахва всички празни редове от новополучения текстов файл.
 в)Напишете програма, която променя текстов файл като - преобразува всички главни букви в малки и обратното, ако има такива.
+
+<details><summary><b>Solution</b></summary> 
+<p>
+
+```cpp
+#include<iostream>
+#include<fstream>
+ 
+const int MAX = 100;
+void combine(const char* firstFile, const char* secondFile)
+{
+ 
+    std::ifstream inFirstFile(firstFile);
+    std::ifstream inSecondFile(secondFile);
+    std::ofstream newFile("combined.txt");
+ 
+    if (!inFirstFile.is_open() || !inSecondFile.is_open() || !newFile.is_open())
+    {
+        std::cout << "Can't open file" << std::endl;
+        return;
+ 
+    }
+ 
+    while (!inFirstFile.eof())
+    {
+        char buff[MAX];
+        inFirstFile.getline(buff, MAX);
+        newFile << buff << '\n';
+    }
+    while (!inSecondFile.eof())
+    {
+        char buff[MAX];
+        inSecondFile.getline(buff, MAX);
+        newFile << buff << '\n';
+    }
+    inFirstFile.close();
+    inSecondFile.close();
+    newFile.close();
+}
+ 
+void removeEmptyLines(const char* fileName)
+{
+    std::ifstream in(fileName);
+ 
+    std::ofstream out("temp.txt");
+ 
+    if (!in.is_open() || !out.is_open())
+    {
+        std::cout << "Can't open file" << std::endl;
+        return;
+ 
+    }
+ 
+    while (!in.eof())
+    {
+        char buff[MAX];
+ 
+        in.getline(buff, MAX);
+       
+        if (strcmp(buff, "") != 0)
+        {
+            out << buff << '\n';
+ 
+        }
+    }
+    in.close();
+    out.close();
+}
+ 
+void changeFile(const char* filename)
+{
+    std::ifstream in(filename);
+ 
+    std::ofstream out("new.txt");
+ 
+    if (!in.is_open() || !out.is_open())
+    {
+        std::cout << "Can't open file" << std::endl;
+        return;
+ 
+    }
+ 
+    char s;
+    while (s = in.get())
+    {
+        if (in.eof())
+        {
+            break;
+        }
+        if (s >= 'a' && s <= 'z')
+        {
+            s = s - 32;
+            out << s;
+        }
+        else if (s >= 'A' && s <= 'Z')
+        {
+            s = s + 32;
+            out << s;
+        }
+        else
+        {
+            out << s;
+        }
+ 
+ 
+    }
+    in.close();
+    out.close();
+}
+int main()
+{
+    combine("first.txt", "second.txt");
+    removeEmptyLines("combined.txt");
+    changeFile("temp.txt");
+    return 0;
+}
+```
+
+</p>
+</details>
 
 ### Задача 4 - 1 точка
 
