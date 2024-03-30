@@ -54,3 +54,358 @@
 Създайте и една такава фунцкия, която да създава нов обект от тип String от конзолзата с произволна дължина до натискане на бутона Enter.
 
 Демонстрирайте работа с низа в един main файл.
+
+<details><summary><b>Solution</b></summary> 
+<p>
+
+Author: Dimitar Donkov
+
+MyString.h
+```cpp
+#pragma once
+#include <cstring>
+#include <iostream>
+
+class MyString
+{
+	size_t capacity = 2;
+	size_t size = 0;
+	char* data = nullptr;
+
+public:
+	MyString();
+
+	MyString(const char* str);
+
+	MyString(char ch);	
+
+	MyString(const MyString& other);
+
+	MyString& operator=(const MyString& other);
+
+	size_t length() const;
+
+	size_t getCapacity() const;
+
+	const char* getData() const;
+
+	void append(char ch);
+
+	void append(const char* str);
+
+	void append(const MyString& other);
+
+	void shrink();
+
+	void addFront(char ch);
+
+	void addFront(const char* str);
+
+	void addFront(const MyString& other);
+
+	const char* findChar(char ch) const;
+
+	const char* findWord(const char* word) const;
+
+	const char* findString(const MyString& other) const;
+
+	MyString substr(size_t start, size_t end) const;
+
+	void clear();
+
+	bool isEqual(const MyString& other) const;
+
+	~MyString();
+
+private:
+	void free();
+
+	void copyFrom(const MyString& other);
+
+	void resize(size_t increase=0);
+};
+
+```
+
+MyString.cpp
+```cpp
+#include "MyString.h"
+
+MyString::MyString() : data(new char[capacity]), size(0), capacity(2)
+{
+	data[0] = '\0';
+}
+
+MyString::MyString(const char* str)
+{
+	if (!str)
+	{
+		size = 0;
+		capacity = 2;
+		data = new char[capacity];
+		data[0] = '\0';
+	}
+	else
+	{
+		size = strlen(str);
+		capacity = strlen(str) + 1;
+		data = new char[capacity];
+		strcpy(data, str);
+	}
+}
+
+MyString::MyString(char ch)
+	: data(new char[2]), size(1), capacity(2)
+{
+	data[0] = ch;
+	data[1] = '\0';
+}
+
+MyString::MyString(const MyString& other)
+{
+	copyFrom(other);
+}
+
+MyString& MyString::operator=(const MyString& other)
+{
+	if (this != &other)
+	{
+		free();
+		copyFrom(other);
+	}
+
+	return *this;
+}
+
+size_t MyString::length() const
+{
+	return size;
+}
+
+size_t MyString::getCapacity() const
+{
+	return capacity;
+}
+
+const char* MyString::getData() const
+{
+	return data;
+}
+
+void MyString::append(char ch)
+{
+	if (capacity - size <= 1)
+		resize();
+
+	data[size++] = ch;
+	data[size] = '\0';
+}
+
+void MyString::append(const char* str)
+{
+	if (capacity - size <= strlen(str))
+		resize(strlen(str));
+
+	size += strlen(str);
+	strcat(data, str);
+}
+
+void MyString::append(const MyString& other)
+{
+	append(other.data);
+}
+
+void MyString::shrink()
+{
+	if (capacity - size == 1)
+		return;
+
+	size_t newCapacity = size + 1;
+	char* newData = new char[size + 1];
+	strcpy(newData, data);
+	
+	delete[] data;
+	data = newData;
+	capacity = newCapacity;
+}
+
+void MyString::addFront(char ch)
+{
+	if (capacity - size <= 1)
+		resize();
+
+	char* newData = new char[capacity];
+	newData[0] = ch;
+	newData[1] = '\0';
+	strcat(newData, data);
+
+	delete[] data;
+	data = newData;
+	++size;
+}
+
+void MyString::addFront(const char* str)
+{
+	if (capacity - size <= strlen(str))
+		resize(strlen(str));
+
+	char* newData = new char[capacity];
+	strcpy(newData, str);
+	strcat(data, str);
+	size += strlen(str);
+}
+
+void MyString::addFront(const MyString& other)
+{
+	addFront(other.data);
+}
+
+const char* MyString::findChar(char ch) const
+{
+	const char* curr = data;
+	while (curr)
+	{
+		if (*curr == ch)
+			return curr;
+		++curr;
+	}
+
+	return nullptr;
+}
+
+const char* MyString::findWord(const char* word) const
+{
+	if (word == nullptr || *word == '\0')
+		return nullptr;
+
+	size_t wordLength = strlen(word);
+	const char* curr = data;
+	size_t index = 0;
+
+	while (*curr != '\0')
+	{
+		if (strncmp(curr, word, wordLength) == 0)
+			return curr;
+
+		++curr;
+	}
+
+	return nullptr;
+}
+
+const char* MyString::findString(const MyString& other) const
+{
+	return findWord(other.data);
+}
+
+MyString MyString::substr(size_t start, size_t end) const
+{
+	if (start >= size || end <= start)
+	{
+		MyString result;
+		return result;
+	}
+
+	if (end >= size)
+		end = size;
+
+	size_t subLength = end - start;
+	char* newData = new char[subLength + 1];
+	strncpy(newData, data + start, subLength);
+	newData[subLength] = '\0';
+
+	MyString result(newData);
+
+	return result;
+}
+
+void MyString::clear()
+{
+	free();
+	capacity = 2;
+	size = 0;
+	data = new char[capacity];
+	data[0] = '\0';
+}
+
+bool MyString::isEqual(const MyString& other) const
+{
+	return strcmp(data, other.data) == 0;
+}
+
+MyString::~MyString()
+{
+	free();
+}
+
+void MyString::free()
+{
+	delete[] data;
+	data = nullptr;
+}
+
+void MyString::copyFrom(const MyString& other)
+{
+	size = other.size;
+	capacity = other.capacity;
+	data = new char[capacity];
+	strcpy(data, other.data);
+}
+
+void MyString::resize(size_t increase)
+{
+	size_t newCapacity = (capacity + increase) * 2;
+	char* newData = new char[newCapacity];
+	strcpy(newData, data);
+
+	delete[] data;
+	data = newData;
+	capacity = newCapacity;
+}
+
+```
+
+main.cpp
+```cpp
+#include <iostream>
+#include "MyString.h"
+
+MyString readFromConsole()
+{
+	MyString s;
+	char ch = std::cin.get();
+	while (ch != '\n')
+	{
+		s.append(ch);
+		std::cin.get(ch);
+	}
+
+	return s;
+}
+
+int main()
+{
+	MyString s1("Zdravei, martin");
+	s1.append(", vsichko e po med i margarin!");
+
+	MyString s2("vsichko");
+	const char* word2 = s1.findString(s2);
+	if (word2)
+		std::cout << word2 << std::endl;
+	else
+		std::cout << "nullptr\n";
+
+	const char* word1 = s1.findWord("Aasfa");
+	if (word1)
+	{
+		std::cout << word1 << std::endl;
+	}
+	else
+	{
+		std::cout << "nullptr\n";
+	}
+}
+```
+
+</p>
+</details>
