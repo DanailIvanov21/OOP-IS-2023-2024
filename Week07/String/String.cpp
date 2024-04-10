@@ -61,7 +61,10 @@ String& String::operator+=(const String& other)
 
 bool String::operator==(const String& other)
 {
-	return *this == other.m_Str;
+	if (this == &other)
+		return true;
+
+	return strcmp(m_Str, other.m_Str) == 0;
 }
 
 bool String::operator!=(const String& other)
@@ -156,8 +159,17 @@ String& String::append(const String& other)
 {
 	const char* otherStr = other.c_str();
 
-	while (*otherStr != '\0')
-		pushBack(*otherStr);
+	if (this != &other)
+	{
+		while (*otherStr != '\0')
+			pushBack(*otherStr);
+	}
+	else
+	{
+		size_t oldSize = m_Size;
+		for (size_t i = 0; i < oldSize; i++)
+			pushBack(otherStr[i]);
+	}
 
 	return *this;
 }
